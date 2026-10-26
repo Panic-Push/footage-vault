@@ -15,9 +15,12 @@ public partial class App : Application
     public App()
     {
         InitializeComponent();
+        // Name the exact resource or binding when a page fails to load (otherwise WinUI only says "XAML parsing failed").
+        DebugSettings.XamlResourceReferenceFailed += (_, e) => Log.Error($"XAML resource not found: {e.Message}");
+        DebugSettings.BindingFailed += (_, e) => Log.Warn($"Binding failed: {e.Message}");
         UnhandledException += (_, e) =>
         {
-            Log.Error("Unhandled UI error", e.Exception);
+            Log.Error($"Unhandled UI error ({e.Message})", e.Exception);
             e.Handled = true;      // keep the app (and running uploads) alive
         };
         AppDomain.CurrentDomain.UnhandledException += (_, e) => Log.Error("Unhandled error", e.ExceptionObject as Exception);
