@@ -13,6 +13,14 @@
             <Thickness x:Key="PageMargin">36,24,36,24</Thickness>
             <x:Double x:Key="CardSpacing">8</x:Double>
 
+            <!-- Transparent button for toolbars (WinUI has no built-in subtle Button style) -->
+            <Style x:Key="SubtleButtonStyleFV" TargetType="Button" BasedOn="{StaticResource DefaultButtonStyle}">
+                <Setter Property="Background" Value="{ThemeResource SubtleFillColorTransparentBrush}" />
+                <Setter Property="BorderBrush" Value="Transparent" />
+                <Setter Property="BorderThickness" Value="0" />
+                <Setter Property="Padding" Value="10,6" />
+            </Style>
+
             <!-- A Windows 11 settings-style card -->
             <Style x:Key="CardStyle" TargetType="Border">
                 <Setter Property="Background" Value="{ThemeResource CardBackgroundFillColorDefaultBrush}" />

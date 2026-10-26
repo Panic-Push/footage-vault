@@ -162,6 +162,7 @@ public sealed class QueueItemViewModel : ObservableObject
     };
 
     public bool ShowBar => _active || (_percent > 0 && _percent < 100 && _kind != "done");
+    public string PercentText => $"{_percent:0}%";
 
     public void Update(ClipRecord r, bool active, long sent, double speed, (string Text, string Kind) status)
     {
@@ -181,6 +182,7 @@ public sealed class QueueItemViewModel : ObservableObject
             }.Where(s => s.Length > 0))
             : Format.Size(r.Size);
         OnPropertyChanged(nameof(ShowBar));
+        OnPropertyChanged(nameof(PercentText));
     }
 }
 

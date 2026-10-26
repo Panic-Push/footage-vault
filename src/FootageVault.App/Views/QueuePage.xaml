@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="FootageVault.Views.QueuePage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:h="using:FootageVault.Helpers"
+    xmlns:vm="using:FootageVault.ViewModels"
+    Background="Transparent">
+
+    <Grid Margin="{StaticResource PageMargin}" RowSpacing="12">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <TextBlock Text="Upload queue" Style="{StaticResource TitleTextBlockStyle}" />
+
+        <InfoBar Grid.Row="1" IsOpen="{x:Bind Vm.BannerOpen, Mode=OneWay}" IsClosable="False"
+                 Title="{x:Bind Vm.BannerTitle, Mode=OneWay}" Message="{x:Bind Vm.BannerText, Mode=OneWay}"
+                 Severity="{x:Bind Vm.BannerSeverity, Mode=OneWay}">
+            <InfoBar.ActionButton>
+                <Button x:Name="BannerAction" Content="Go to Home" Click="OnGoHome" />
+            </InfoBar.ActionButton>
+        </InfoBar>
+
+        <Grid Grid.Row="2" ColumnSpacing="16" Visibility="{x:Bind h:Ui.Show(Vm.HasItems), Mode=OneWay}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <TextBlock Text="{x:Bind Vm.Summary, Mode=OneWay}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" VerticalAlignment="Center" />
+            <ProgressBar Grid.Column="1" Value="{x:Bind Vm.Overall, Mode=OneWay}" Maximum="100" VerticalAlignment="Center" />
+        </Grid>
+
+        <CommandBar Grid.Row="3" DefaultLabelPosition="Right" HorizontalAlignment="Left" Background="Transparent" IsOpen="False">
+            <AppBarButton Label="Pause all" Click="OnPause" IsEnabled="{x:Bind Vm.CanPause, Mode=OneWay}">
+                <AppBarButton.Icon><FontIcon Glyph="&#xE769;" /></AppBarButton.Icon>
+            </AppBarButton>
+            <AppBarButton Label="Resume" Click="OnResume" IsEnabled="{x:Bind Vm.CanResume, Mode=OneWay}">
+                <AppBarButton.Icon><FontIcon Glyph="&#xE768;" /></AppBarButton.Icon>
+            </AppBarButton>
+            <AppBarSeparator />
+            <AppBarButton Label="Retry failed" Click="OnRetry" IsEnabled="{x:Bind Vm.CanRetry, Mode=OneWay}">
+                <AppBarButton.Icon><FontIcon Glyph="&#xE72C;" /></AppBarButton.Icon>
+            </AppBarButton>
+            <AppBarButton Label="Remove" Click="OnRemove" ToolTipService.ToolTip="Remove the selected clips from the queue">
+                <AppBarButton.Icon><FontIcon Glyph="&#xE74D;" /></AppBarButton.Icon>
+            </AppBarButton>
+            <AppBarButton Label="Open on YouTube" Click="OnOpen">
+                <AppBarButton.Icon><FontIcon Glyph="&#xE8A7;" /></AppBarButton.Icon>
+            </AppBarButton>
+            <AppBarButton Label="Clear finished" Click="OnClear" IsEnabled="{x:Bind Vm.CanClear, Mode=OneWay}">
+                <AppBarButton.Icon><FontIcon Glyph="&#xE894;" /></AppBarButton.Icon>
+            </AppBarButton>
+        </CommandBar>
+
+        <ListView Grid.Row="4" x:Name="List" ItemsSource="{x:Bind Vm.Items}" SelectionMode="Extended"
+                  Visibility="{x:Bind h:Ui.Show(Vm.HasItems), Mode=OneWay}" AutomationProperties.Name="Upload queue">
+            <ListView.ItemTemplate>
+                <DataTemplate x:DataType="vm:QueueItemViewModel">
+                    <Grid ColumnSpacing="14" Padding="0,10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="24" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="200" />
+                        </Grid.ColumnDefinitions>
+                        <ProgressRing Width="20" Height="20" IsActive="{x:Bind IsActive, Mode=OneWay}"
+                                      IsIndeterminate="{x:Bind Indeterminate, Mode=OneWay}" Value="{x:Bind Percent, Mode=OneWay}"
+                                      Visibility="{x:Bind h:Ui.Show(IsActive), Mode=OneWay}" />
+                        <Grid Visibility="{x:Bind h:Ui.Show(IsIdle), Mode=OneWay}">
+                            <FontIcon Glyph="&#xE930;" FontSize="16" Foreground="{ThemeResource SystemFillColorSuccessBrush}"
+                                      Visibility="{x:Bind h:Ui.Show(IsDone), Mode=OneWay}" />
+                            <FontIcon Glyph="&#xEA39;" FontSize="16" Foreground="{ThemeResource SystemFillColorCriticalBrush}"
+                                      Visibility="{x:Bind h:Ui.Show(IsFailed), Mode=OneWay}" />
+                            <FontIcon Glyph="&#xE823;" FontSize="16" Foreground="{ThemeResource SystemFillColorCautionBrush}"
+                                      Visibility="{x:Bind h:Ui.Show(IsAttention), Mode=OneWay}" />
+                        </Grid>
+                        <StackPanel Grid.Column="1" Spacing="2" VerticalAlignment="Center">
+                            <TextBlock Text="{x:Bind Title, Mode=OneWay}" TextTrimming="CharacterEllipsis" />
+                            <TextBlock Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                       TextTrimming="CharacterEllipsis">
+                                <Run Text="{x:Bind Status, Mode=OneWay}" /><Run Text="  ·  " /><Run Text="{x:Bind Detail, Mode=OneWay}" />
+                            </TextBlock>
+                        </StackPanel>
+                        <StackPanel Grid.Column="2" Spacing="6" VerticalAlignment="Center" Visibility="{x:Bind h:Ui.Show(ShowBar), Mode=OneWay}">
+                            <TextBlock HorizontalAlignment="Right" Style="{StaticResource CaptionTextBlockStyle}"
+                                       Foreground="{ThemeResource TextFillColorSecondaryBrush}">
+                                <Run Text="{x:Bind PercentText, Mode=OneWay}" />
+                            </TextBlock>
+                            <ProgressBar Value="{x:Bind Percent, Mode=OneWay}" Maximum="100" />
+                        </StackPanel>
+                    </Grid>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+
+        <StackPanel Grid.Row="4" VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="12"
+                    Visibility="{x:Bind h:Ui.Show(Vm.IsEmpty), Mode=OneWay}">
+            <FontIcon Glyph="&#xE898;" FontSize="40" Foreground="{ThemeResource TextFillColorTertiaryBrush}" />
+            <TextBlock Text="The queue is empty" Style="{StaticResource SubtitleTextBlockStyle}" HorizontalAlignment="Center" />
+            <TextBlock Text="Add story folders on the Home page to start." Foreground="{ThemeResource TextFillColorSecondaryBrush}" HorizontalAlignment="Center" />
+        </StackPanel>
+    </Grid>
+</Page>

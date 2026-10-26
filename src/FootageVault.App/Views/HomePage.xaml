@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="FootageVault.Views.HomePage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:h="using:FootageVault.Helpers"
+    Background="Transparent">
+
+    <ScrollViewer>
+        <StackPanel Margin="{StaticResource PageMargin}" Spacing="12" MaxWidth="1100" HorizontalAlignment="Stretch">
+            <TextBlock x:Name="Greeting" Style="{StaticResource TitleTextBlockStyle}" Margin="0,0,0,8" />
+
+            <InfoBar x:Name="SetupBar" Severity="Warning" IsClosable="False" Title="Connect to Google"
+                     Message="Footage Vault needs the Google client file (client_secret.json) you downloaded from Google Cloud.">
+                <InfoBar.ActionButton>
+                    <Button Content="Choose file" Click="OnChooseClientFile" />
+                </InfoBar.ActionButton>
+            </InfoBar>
+
+            <!-- Account -->
+            <Border Style="{StaticResource CardStyle}">
+                <Grid ColumnSpacing="16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <PersonPicture x:Name="Avatar" Width="40" Height="40" />
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
+                        <TextBlock x:Name="AccountTitle" Style="{StaticResource BodyStrongTextBlockStyle}" />
+                        <TextBlock x:Name="AccountSub" Style="{StaticResource CaptionTextBlockStyle}"
+                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}" TextWrapping="Wrap" />
+                    </StackPanel>
+                    <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                        <ProgressRing x:Name="AuthRing" Width="20" Height="20" IsActive="False" />
+                        <Button x:Name="SignInButton" Style="{StaticResource AccentButtonStyle}" Click="OnSignIn">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <FontIcon Glyph="&#xE77B;" FontSize="16" />
+                                <TextBlock Text="Sign in with Google" />
+                            </StackPanel>
+                        </Button>
+                        <Button x:Name="CancelSignInButton" Content="Cancel" Click="OnCancelSignIn" />
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- Drop zone: drag one or more folders here from File Explorer -->
+            <Grid x:Name="DropZone" MinHeight="220" AllowDrop="True" Background="Transparent"
+                  DragOver="OnDragOver" DragLeave="OnDragLeave" Drop="OnDrop" Tapped="OnDropZoneTapped"
+                  AutomationProperties.Name="Add footage folders">
+                <Rectangle x:Name="DropBorder" RadiusX="8" RadiusY="8" StrokeThickness="1.5" StrokeDashArray="4,3"
+                           Stroke="{ThemeResource ControlStrongStrokeColorDefaultBrush}"
+                           Fill="{ThemeResource CardBackgroundFillColorDefaultBrush}" />
+                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="8" Padding="24">
+                    <FontIcon x:Name="DropIcon" Glyph="&#xE838;" FontSize="40" Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}" />
+                    <ProgressRing x:Name="ScanRing" Width="40" Height="40" IsActive="False" Visibility="Collapsed" />
+                    <TextBlock x:Name="DropTitle" Text="Drop story folders here" HorizontalAlignment="Center"
+                               Style="{StaticResource SubtitleTextBlockStyle}" />
+                    <TextBlock x:Name="DropSub" HorizontalAlignment="Center" TextAlignment="Center" TextWrapping="Wrap"
+                               Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                               Text="Add as many as you like. Sub-folders become their own stories, e.g. Collector Visit - Phone 1." />
+                    <Button x:Name="AddButton" HorizontalAlignment="Center" Margin="0,8,0,0"
+                            Style="{StaticResource AccentButtonStyle}" Click="OnAddFolders">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <FontIcon Glyph="&#xE8F4;" FontSize="16" />
+                            <TextBlock Text="Add folders" />
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+            </Grid>
+
+            <!-- Today + queue -->
+            <Grid ColumnSpacing="12">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Border Style="{StaticResource CardStyle}" Padding="20">
+                    <StackPanel Spacing="12">
+                        <TextBlock Text="Today's uploads" Style="{StaticResource BodyStrongTextBlockStyle}" />
+                        <StackPanel Orientation="Horizontal" Spacing="20">
+                            <Grid Width="96" Height="96">
+                                <ProgressRing x:Name="QuotaRing" Width="96" Height="96" IsIndeterminate="False"
+                                              Background="{ThemeResource ControlStrongStrokeColorDisabledBrush}" />
+                                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                                    <TextBlock x:Name="QuotaUsed" HorizontalAlignment="Center" Style="{StaticResource SubtitleTextBlockStyle}" />
+                                    <TextBlock x:Name="QuotaOf" HorizontalAlignment="Center" Style="{StaticResource CaptionTextBlockStyle}"
+                                               Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                </StackPanel>
+                            </Grid>
+                            <StackPanel VerticalAlignment="Center" Spacing="4">
+                                <TextBlock x:Name="QuotaLeft" Style="{StaticResource SubtitleTextBlockStyle}" />
+                                <TextBlock x:Name="QuotaReset" Foreground="{ThemeResource TextFillColorSecondaryBrush}" TextWrapping="Wrap" />
+                            </StackPanel>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+                <Border Grid.Column="1" Style="{StaticResource CardStyle}" Padding="20">
+                    <Grid RowSpacing="12">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <Grid>
+                            <TextBlock Text="Upload queue" Style="{StaticResource BodyStrongTextBlockStyle}" />
+                            <HyperlinkButton Content="Open queue" HorizontalAlignment="Right" Padding="4,0" Click="OnOpenQueue" />
+                        </Grid>
+                        <Grid Grid.Row="1" VerticalAlignment="Bottom" ColumnSpacing="8">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition /><ColumnDefinition /><ColumnDefinition /><ColumnDefinition />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel>
+                                <TextBlock x:Name="StatWaiting" Style="{StaticResource TitleTextBlockStyle}" />
+                                <TextBlock Text="Waiting" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="1">
+                                <TextBlock x:Name="StatUploading" Style="{StaticResource TitleTextBlockStyle}" />
+                                <TextBlock Text="Uploading" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="2">
+                                <TextBlock x:Name="StatDone" Style="{StaticResource TitleTextBlockStyle}" />
+                                <TextBlock Text="Uploaded" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="3">
+                                <TextBlock x:Name="StatFailed" Style="{StaticResource TitleTextBlockStyle}" />
+                                <TextBlock Text="Failed" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                            </StackPanel>
+                        </Grid>
+                    </Grid>
+                </Border>
+            </Grid>
+
+            <TextBlock x:Name="FootNote" TextWrapping="Wrap" Style="{StaticResource CaptionTextBlockStyle}"
+                       Foreground="{ThemeResource TextFillColorTertiaryBrush}" />
+        </StackPanel>
+    </ScrollViewer>
+</Page>

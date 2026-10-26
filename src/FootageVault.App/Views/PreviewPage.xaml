@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="FootageVault.Views.PreviewPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:h="using:FootageVault.Helpers"
+    xmlns:vm="using:FootageVault.ViewModels"
+    Background="Transparent">
+
+    <Page.Resources>
+        <!-- One video -->
+        <DataTemplate x:Key="ClipTemplate" x:DataType="vm:ClipViewModel">
+            <Grid ColumnSpacing="12" Padding="0,6" ToolTipService.ToolTip="{x:Bind FullPath}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="32" />
+                    <ColumnDefinition Width="2*" MinWidth="140" />
+                    <ColumnDefinition Width="3*" MinWidth="200" />
+                    <ColumnDefinition Width="72" />
+                    <ColumnDefinition Width="72" />
+                    <ColumnDefinition Width="2*" />
+                </Grid.ColumnDefinitions>
+                <CheckBox IsChecked="{x:Bind Selected, Mode=TwoWay}" MinWidth="0" VerticalAlignment="Center"
+                          AutomationProperties.Name="Upload this clip" />
+                <TextBlock Grid.Column="1" Text="{x:Bind FileName}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
+                           Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                <TextBlock Grid.Column="2" Text="{x:Bind Title, Mode=OneWay}" VerticalAlignment="Center"
+                           TextTrimming="CharacterEllipsis" Opacity="{x:Bind TitleOpacity, Mode=OneWay}" />
+                <TextBlock Grid.Column="3" Text="{x:Bind DateText, Mode=OneWay}" VerticalAlignment="Center"
+                           Foreground="{ThemeResource TextFillColorTertiaryBrush}" />
+                <TextBlock Grid.Column="4" Text="{x:Bind Size}" VerticalAlignment="Center" HorizontalAlignment="Right"
+                           Foreground="{ThemeResource TextFillColorTertiaryBrush}" />
+                <StackPanel Grid.Column="5" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center"
+                            Visibility="{x:Bind h:Ui.Show(HasNotes), Mode=OneWay}">
+                    <FontIcon Glyph="&#xE7BA;" FontSize="14" Foreground="{ThemeResource SystemFillColorCautionBrush}"
+                              Visibility="{x:Bind h:Ui.Show(IsWarning), Mode=OneWay}" />
+                    <FontIcon Glyph="&#xE946;" FontSize="14" Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
+                              Visibility="{x:Bind h:Ui.Show(IsDuplicate)}" />
+                    <TextBlock Text="{x:Bind Notes, Mode=OneWay}" TextTrimming="CharacterEllipsis" Style="{StaticResource CaptionTextBlockStyle}"
+                               Foreground="{ThemeResource TextFillColorSecondaryBrush}" VerticalAlignment="Center" />
+                </StackPanel>
+            </Grid>
+        </DataTemplate>
+
+        <!-- One story (a folder that holds videos); nested ones get an editable sub-folder name -->
+        <DataTemplate x:Key="StoryTemplate" x:DataType="vm:StoryViewModel">
+            <StackPanel Spacing="4" Margin="0,8,0,0">
+                <Grid ColumnSpacing="10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                        <FontIcon Glyph="&#xE8B7;" FontSize="16" Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                  Visibility="{x:Bind h:Ui.Show(Nested)}" />
+                        <TextBox Text="{x:Bind FolderName, Mode=TwoWay}" Width="220" Visibility="{x:Bind h:Ui.Show(Nested)}"
+                                 KeyDown="OnCommitKey" AutomationProperties.Name="Sub-folder name"
+                                 ToolTipService.ToolTip="Rename this sub-folder. Its clips' titles update straight away." />
+                        <TextBlock Text="{x:Bind Heading}" Style="{StaticResource BodyStrongTextBlockStyle}" VerticalAlignment="Center"
+                                   Visibility="{x:Bind h:Ui.Show(IsTopItself)}" />
+                    </StackPanel>
+                    <TextBox Grid.Column="1" Text="{x:Bind DateText, Mode=TwoWay}" Width="104" PlaceholderText="dd.mm.yy"
+                             KeyDown="OnCommitKey" AutomationProperties.Name="Date for every clip in this folder"
+                             Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                             ToolTipService.ToolTip="Date for every clip in this folder. Type it like 26.10.26." />
+                    <TextBlock Grid.Column="2" VerticalAlignment="Center" Style="{StaticResource CaptionTextBlockStyle}"
+                               Foreground="{ThemeResource SystemFillColorCriticalBrush}" Text="{x:Bind DateError, Mode=OneWay}"
+                               Visibility="{x:Bind h:Ui.Show(HasDateError), Mode=OneWay}" />
+                    <StackPanel Grid.Column="3" Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
+                        <TextBlock Text="{x:Bind RenameNote, Mode=OneWay}" Style="{StaticResource CaptionTextBlockStyle}"
+                                   Foreground="{ThemeResource TextFillColorTertiaryBrush}" />
+                        <TextBlock Text="{x:Bind MixedNote, Mode=OneWay}" Style="{StaticResource CaptionTextBlockStyle}"
+                                   Foreground="{ThemeResource SystemFillColorCautionBrush}" TextWrapping="Wrap" />
+                    </StackPanel>
+                    <Button Grid.Column="4" Style="{StaticResource SubtleButtonStyleFV}" Click="OnSortStory"
+                            ToolTipService.ToolTip="Order these clips by recording time">
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <FontIcon Glyph="&#xE8CB;" FontSize="14" />
+                            <TextBlock Text="Sort by time" />
+                        </StackPanel>
+                    </Button>
+                </Grid>
+                <ListView ItemsSource="{x:Bind Clips}" ItemTemplate="{StaticResource ClipTemplate}"
+                          SelectionMode="None" CanReorderItems="True" CanDragItems="True" AllowDrop="True"
+                          ScrollViewer.VerticalScrollMode="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled"
+                          Margin="-12,0,0,0" AutomationProperties.Name="Clips. Drag to change the order." />
+            </StackPanel>
+        </DataTemplate>
+
+        <!-- One chosen folder -->
+        <DataTemplate x:Key="FolderTemplate" x:DataType="vm:FolderViewModel">
+            <Border Style="{StaticResource CardStyle}" Padding="20,16">
+                <StackPanel>
+                    <Grid ColumnSpacing="12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <FontIcon Glyph="&#xE8D5;" FontSize="20" Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}" VerticalAlignment="Center" />
+                        <TextBox Grid.Column="1" Text="{x:Bind Name, Mode=TwoWay}" MinWidth="260" FontWeight="SemiBold"
+                                 KeyDown="OnCommitKey" AutomationProperties.Name="Folder name"
+                                 ToolTipService.ToolTip="Rename this folder. All titles inside update straight away." />
+                        <StackPanel Grid.Column="2" VerticalAlignment="Center" Spacing="2">
+                            <TextBlock Text="{x:Bind Counts, Mode=OneWay}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                            <TextBlock Text="{x:Bind RenameNote, Mode=OneWay}" Style="{StaticResource CaptionTextBlockStyle}"
+                                       Foreground="{ThemeResource TextFillColorTertiaryBrush}" />
+                        </StackPanel>
+                        <StackPanel Grid.Column="3" Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
+                            <Button Click="OnUploadFolder" ToolTipService.ToolTip="Upload only this folder">
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <FontIcon Glyph="&#xE898;" FontSize="14" />
+                                    <TextBlock Text="Upload" />
+                                </StackPanel>
+                            </Button>
+                            <Button Style="{StaticResource SubtleButtonStyleFV}" Click="OnRemoveFolder" ToolTipService.ToolTip="Remove from preview (nothing is deleted)">
+                                <FontIcon Glyph="&#xE711;" FontSize="14" />
+                            </Button>
+                        </StackPanel>
+                    </Grid>
+                    <ItemsControl ItemsSource="{x:Bind Stories}" ItemTemplate="{StaticResource StoryTemplate}" Margin="32,4,0,0" />
+                </StackPanel>
+            </Border>
+        </DataTemplate>
+    </Page.Resources>
+
+    <Grid Margin="{StaticResource PageMargin}" RowSpacing="12">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Grid>
+            <StackPanel Spacing="4">
+                <TextBlock Text="Preview" Style="{StaticResource TitleTextBlockStyle}" />
+                <TextBlock Text="{x:Bind Vm.Summary, Mode=OneWay}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right" VerticalAlignment="Bottom">
+                <Button Click="OnShowSkipped" Visibility="{x:Bind h:Ui.Show(Vm.HasSkipped), Mode=OneWay}">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <FontIcon Glyph="&#xE7C1;" FontSize="14" />
+                        <TextBlock Text="{x:Bind Vm.SkippedText, Mode=OneWay}" />
+                    </StackPanel>
+                </Button>
+                <Button Click="OnAddMore">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <FontIcon Glyph="&#xE710;" FontSize="14" />
+                        <TextBlock Text="Add folders" />
+                    </StackPanel>
+                </Button>
+                <Button Style="{StaticResource AccentButtonStyle}" Click="OnUploadAll" IsEnabled="{x:Bind Vm.HasFolders, Mode=OneWay}">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <FontIcon Glyph="&#xE898;" FontSize="14" />
+                        <TextBlock Text="Upload all" />
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+        </Grid>
+
+        <InfoBar Grid.Row="1" x:Name="Message" IsOpen="False" IsClosable="True" />
+
+        <InfoBar Grid.Row="2" IsOpen="{x:Bind Vm.HasFolders, Mode=OneWay}" IsClosable="True" Severity="Informational"
+                 Message="Check names and dates, then upload. Type a new date over the grey dd.mm.yy to change every clip in that folder. Drag clips to change their order." />
+
+        <ScrollViewer Grid.Row="3" Visibility="{x:Bind h:Ui.Show(Vm.HasFolders), Mode=OneWay}">
+            <ItemsControl ItemsSource="{x:Bind Vm.Folders}" ItemTemplate="{StaticResource FolderTemplate}" Margin="0,0,12,0">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Spacing="12" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+            </ItemsControl>
+        </ScrollViewer>
+
+        <StackPanel Grid.Row="3" VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="12"
+                    Visibility="{x:Bind h:Ui.Show(Vm.IsEmpty), Mode=OneWay}">
+            <FontIcon Glyph="&#xE8B7;" FontSize="40" Foreground="{ThemeResource TextFillColorTertiaryBrush}" />
+            <TextBlock Text="Nothing to preview yet" Style="{StaticResource SubtitleTextBlockStyle}" HorizontalAlignment="Center" />
+            <TextBlock Text="Add story folders on the Home page, or here." Foreground="{ThemeResource TextFillColorSecondaryBrush}" HorizontalAlignment="Center" />
+            <Button Content="Add folders" Click="OnAddMore" HorizontalAlignment="Center" Style="{StaticResource AccentButtonStyle}" />
+        </StackPanel>
+    </Grid>
+</Page>
