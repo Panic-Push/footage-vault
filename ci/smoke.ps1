@@ -57,8 +57,19 @@ Run 'settings' @('--page', 'settings')
 # 3. Logged errors
 $logs = Join-Path $env:LOCALAPPDATA 'FootageVault\logs'
 if (Test-Path $logs) {
-    $errs = Get-ChildItem $logs -Filter 'app-*.log' | Get-Content | Where-Object { $_ -match ' ERROR ' } | Select-Object -First 15
-    foreach ($e in $errs) { Fail ($e -replace '%', '%25') }
+    $all = (Get-ChildItem $logs -Filter 'app-*.log' | Get-Content -Raw) -join "`n"
+    # each ERROR entry runs until the next timestamped line; report the first few in full
+    $blocks = [regex]::Matches($all, '(?ms)^\d{4}-\d\d-\d\d [\d:.]+ ERROR .*?(?=^\d{4}-\d\d-\d\d |\z)')
+    $seen = @{}
+    foreach ($b in $blocks) {
+        $text = ($b.Value -replace '^\S+ \S+ ', '').Trim()
+        $key = ($text -split "`n")[0..3] -join ' '
+        if ($seen.ContainsKey($key)) { continue }
+        $seen[$key] = 1
+        $short = (($text -split "`n") | Select-Object -First 25) -join "`n"
+        Fail ($short.Replace('%', '%25').Replace("`r", '').Replace("`n", '%0A'))
+        if ($seen.Count -ge 3) { break }
+    }
     Get-ChildItem $logs -Filter 'app-*.log' | Get-Content | Select-Object -Last 30 | Out-Host
 }
 # Windows Error Reporting / .NET crash events from the last minutes
