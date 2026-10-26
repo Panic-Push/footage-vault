@@ -18,6 +18,8 @@ jobs:
         with:
           dotnet-version: 8.0.x
 
+      - uses: microsoft/setup-msbuild@v2
+
       - name: Run core tests
         shell: pwsh
         run: ./ci/run.ps1 -Title "Core tests" -Command "dotnet run --project tests/FootageVault.Core.Tests -c Release"
@@ -25,7 +27,8 @@ jobs:
       - name: Publish app
         if: success() || failure()     # build even when tests fail, so both sets of problems show up at once
         shell: pwsh
-        run: ./ci/run.ps1 -Title "Build app" -Command "dotnet publish src/FootageVault.App/FootageVault.App.csproj -c Release -r win-x64 -p:Platform=x64 -p:Version=1.0.${{ github.run_number }} -o publish -nologo -clp:NoSummary"
+        # Visual Studio's MSBuild: it carries the WinUI resource (PRI) tools that the plain dotnet CLI lacks.
+        run: ./ci/run.ps1 -Title "Build app" -Command "msbuild src/FootageVault.App/FootageVault.App.csproj -restore -t:Publish -p:Configuration=Release -p:Platform=x64 -p:RuntimeIdentifier=win-x64 -p:Version=1.0.${{ github.run_number }} -p:PublishDir=$((Resolve-Path .).Path)\publish\ -nologo -v:minimal"
 
       - name: Build installer
         shell: pwsh

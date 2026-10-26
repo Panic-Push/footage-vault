@@ -118,7 +118,7 @@ public sealed class TempDir : IDisposable
         return p;
     }
 
-    public string Sub(string rel) => System.IO.Path.Combine(Path, rel);
+    public string Sub(string rel) => System.IO.Path.GetFullPath(System.IO.Path.Combine(Path, rel));
 
     public void Dispose()
     {
