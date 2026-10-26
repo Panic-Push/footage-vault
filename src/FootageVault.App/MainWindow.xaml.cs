@@ -48,6 +48,12 @@ public sealed partial class MainWindow : Window
         else if (tag == "settings") Nav.SelectedItem = Nav.SettingsItem;
     }
 
+    public void StartScan(IReadOnlyList<string> folders)
+    {
+        GoTo("home");
+        if (_pages.TryGetValue("home", out var p) && p is HomePage home) _ = home.ScanFoldersAsync(folders.ToList());
+    }
+
     private void OnNavSelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
     {
         var tag = args.IsSettingsSelected ? "settings" : (args.SelectedItem as NavigationViewItem)?.Tag as string ?? "home";

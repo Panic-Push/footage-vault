@@ -33,5 +33,12 @@ public partial class App : Application
         AppHost.Current.Init(DispatcherQueue.GetForCurrentThread());
         Window = new MainWindow();
         Window.Activate();
+
+        // Used by the automatic Windows check: --page <name> and --scan <folder>... (no effect otherwise)
+        var argv = Environment.GetCommandLineArgs();
+        var scan = argv.SkipWhile(a => a != "--scan").Skip(1).TakeWhile(a => !a.StartsWith("--")).ToList();
+        var page = argv.SkipWhile(a => a != "--page").Skip(1).FirstOrDefault();
+        if (scan.Count > 0) Window.StartScan(scan);
+        else if (page is not null) Window.GoTo(page);
     }
 }

@@ -161,6 +161,8 @@ public sealed partial class HomePage : Page, IActivatable, ITickable
         await ScanAsync(folders);
     }
 
+    public Task ScanFoldersAsync(List<string> folders) => ScanAsync(folders);
+
     private async Task ScanAsync(List<string> folders)
     {
         _scanning = true;

@@ -40,6 +40,27 @@ jobs:
           ./ci/run.ps1 -Title "Installer" -Command "& '$iscc' /DAppVersion=1.0.${{ github.run_number }} /DSourceDir=..\publish installer\FootageVault.iss"
 
 
+      - name: Install and open the app (smoke test)
+        id: smoke
+        shell: pwsh
+        run: ./ci/smoke.ps1
+
+      - name: Share screenshots on the ci-screens branch
+        if: always() && steps.smoke.outcome != 'skipped'
+        shell: pwsh
+        run: |
+          $src = Join-Path $env:RUNNER_TEMP 'screens'
+          if (-not (Test-Path $src)) { exit 0 }
+          $dir = Join-Path $env:RUNNER_TEMP 'screens-repo'
+          New-Item -ItemType Directory -Force $dir | Out-Null
+          Copy-Item "$src\*.png" $dir
+          Set-Location $dir
+          git init -q -b ci-screens
+          git config user.name "ci"; git config user.email "ci@users.noreply.github.com"
+          "Run ${{ github.run_number }} (${{ github.sha }})" | Out-File README.md
+          git add -A; git commit -q -m "Screenshots from run ${{ github.run_number }}"
+          git push -q -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" ci-screens
+
       - name: Upload installer artifact
         uses: actions/upload-artifact@v4
         with:
