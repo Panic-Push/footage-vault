@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Window
+    x:Class="FootageVault.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Title="Footage Vault">
+    <Window.SystemBackdrop>
+        <MicaBackdrop />
+    </Window.SystemBackdrop>
+
+    <Grid>
+        <NavigationView x:Name="Nav" PaneDisplayMode="Left" IsBackButtonVisible="Collapsed">
+            <NavigationView.MenuItems>
+                <NavigationViewItem Content="Home" Icon="Home" Tag="home" IsSelected="True" />
+            </NavigationView.MenuItems>
+            <TextBlock Margin="36" Style="{StaticResource TitleTextBlockStyle}" Text="Footage Vault" />
+        </NavigationView>
+    </Grid>
+</Window>

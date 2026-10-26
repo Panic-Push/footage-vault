@@ -1,0 +1,8 @@
+bin/
+obj/
+publish/
+installer/Output/
+*.user
+.vs/
+# Never commit the Google OAuth client file
+client_secret*.json
