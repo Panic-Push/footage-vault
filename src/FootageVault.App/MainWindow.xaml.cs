@@ -87,11 +87,6 @@ public sealed partial class MainWindow : Window
         var w = Math.Min((int)(1240 * scale), (int)(area.Width * 0.92));
         var h = Math.Min((int)(820 * scale), (int)(area.Height * 0.92));
         AppWindow.MoveAndResize(new RectInt32(area.X + (area.Width - w) / 2, area.Y + (area.Height - h) / 2, w, h));
-        if (AppWindow.Presenter is OverlappedPresenter p)
-        {
-            p.PreferredMinimumWidth = (int)(900 * scale);
-            p.PreferredMinimumHeight = (int)(600 * scale);
-        }
     }
 
     private async void OnClosing(AppWindow sender, AppWindowClosingEventArgs args)
