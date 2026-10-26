@@ -28,7 +28,7 @@ public sealed partial class HomePage : Page, IActivatable, ITickable
 
     private void OnHostChanged(object? sender, PropertyChangedEventArgs e) => _host.Ui(Refresh);
 
-    private static string Greeting()
+    private static string GreetingText()
     {
         var h = TimeZones.ToIst(DateTimeOffset.UtcNow).Hour;
         return h < 12 ? "Good morning" : h < 17 ? "Good afternoon" : "Good evening";
@@ -36,7 +36,7 @@ public sealed partial class HomePage : Page, IActivatable, ITickable
 
     private void Refresh()
     {
-        Greeting.Text = Greeting();
+        Greeting.Text = GreetingText();
         SetupBar.IsOpen = !_host.HasClientSecret;
         AuthRing.IsActive = _host.AuthBusy;
         AuthRing.Visibility = Ui.Show(_host.AuthBusy);
