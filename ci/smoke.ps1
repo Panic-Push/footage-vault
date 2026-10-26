@@ -17,6 +17,10 @@ $uninstall = Get-ChildItem 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Unin
     Where-Object { $_.DisplayName -eq 'Footage Vault' }
 if (-not $uninstall) { Fail 'Not listed under Settings > Apps (no uninstall entry)' } else { Write-Host "Apps list entry OK" }
 
+$inst = Split-Path $exe
+Write-Host "Resource files installed:"; Get-ChildItem $inst -Recurse -Include *.pri, *.xbf | ForEach-Object { Write-Host "  $($_.FullName.Substring($inst.Length))" }
+if (-not (Get-ChildItem $inst -Filter *.pri)) { Fail 'No .pri resource file was installed next to FootageVault.exe' }
+
 # 2. Sample footage: a story with two phone sub-folders, plus a second story
 $root = Join-Path $env:RUNNER_TEMP 'Footage'
 $files = @('Collector Visit\VID_0081.MOV', 'Collector Visit\VID_0082.MOV', 'Collector Visit\Phone 1\IMG_4410.MP4',
