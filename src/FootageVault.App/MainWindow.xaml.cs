@@ -45,7 +45,12 @@ public sealed partial class MainWindow : Window
     {
         var item = Nav.MenuItems.OfType<NavigationViewItem>().FirstOrDefault(i => (string)i.Tag == tag);
         if (item is not null) Nav.SelectedItem = item;
-        else if (tag == "settings") Nav.SelectedItem = Nav.SettingsItem;
+        else if (tag == "settings")
+        {
+            // the Settings entry only exists once the navigation pane has loaded
+            if (Nav.SettingsItem is not null) Nav.SelectedItem = Nav.SettingsItem;
+            else Nav.Loaded += (_, _) => Nav.SelectedItem = Nav.SettingsItem;
+        }
     }
 
     public void StartScan(IReadOnlyList<string> folders)

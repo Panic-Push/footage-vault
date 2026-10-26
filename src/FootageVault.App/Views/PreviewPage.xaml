@@ -13,11 +13,11 @@
             <Grid ColumnSpacing="12" Padding="0,6" ToolTipService.ToolTip="{x:Bind FullPath}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="32" />
-                    <ColumnDefinition Width="2*" MinWidth="140" />
-                    <ColumnDefinition Width="3*" MinWidth="200" />
-                    <ColumnDefinition Width="72" />
-                    <ColumnDefinition Width="72" />
-                    <ColumnDefinition Width="2*" />
+                    <ColumnDefinition Width="1.3*" MinWidth="110" />
+                    <ColumnDefinition Width="3.5*" MinWidth="220" />
+                    <ColumnDefinition Width="64" />
+                    <ColumnDefinition Width="64" />
+                    <ColumnDefinition Width="1.6*" />
                 </Grid.ColumnDefinitions>
                 <CheckBox IsChecked="{x:Bind Selected, Mode=TwoWay}" MinWidth="0" VerticalAlignment="Center"
                           AutomationProperties.Name="Upload this clip" />
@@ -55,7 +55,7 @@
                     <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
                         <FontIcon Glyph="&#xE8B7;" FontSize="16" Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                   Visibility="{x:Bind h:Ui.Show(Nested)}" />
-                        <TextBox Text="{x:Bind FolderName, Mode=TwoWay}" Width="220" Visibility="{x:Bind h:Ui.Show(Nested)}"
+                        <TextBox Text="{x:Bind FolderName, Mode=TwoWay}" Width="200" Visibility="{x:Bind h:Ui.Show(Nested)}"
                                  KeyDown="OnCommitKey" AutomationProperties.Name="Sub-folder name"
                                  ToolTipService.ToolTip="Rename this sub-folder. Its clips' titles update straight away." />
                         <TextBlock Text="{x:Bind Heading}" Style="{StaticResource BodyStrongTextBlockStyle}" VerticalAlignment="Center"
@@ -101,11 +101,11 @@
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
                         <FontIcon Glyph="&#xE8D5;" FontSize="20" Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}" VerticalAlignment="Center" />
-                        <TextBox Grid.Column="1" Text="{x:Bind Name, Mode=TwoWay}" MinWidth="260" FontWeight="SemiBold"
+                        <TextBox Grid.Column="1" Text="{x:Bind Name, Mode=TwoWay}" MinWidth="220" MaxWidth="360" FontWeight="SemiBold"
                                  KeyDown="OnCommitKey" AutomationProperties.Name="Folder name"
                                  ToolTipService.ToolTip="Rename this folder. All titles inside update straight away." />
                         <StackPanel Grid.Column="2" VerticalAlignment="Center" Spacing="2">
-                            <TextBlock Text="{x:Bind Counts, Mode=OneWay}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                            <TextBlock Text="{x:Bind Counts, Mode=OneWay}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" TextWrapping="Wrap" />
                             <TextBlock Text="{x:Bind RenameNote, Mode=OneWay}" Style="{StaticResource CaptionTextBlockStyle}"
                                        Foreground="{ThemeResource TextFillColorTertiaryBrush}" />
                         </StackPanel>
