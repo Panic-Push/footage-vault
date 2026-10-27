@@ -55,8 +55,13 @@ Records: `Documents\FootageVault\upload_log.csv` (opens in Excel) and the **Hist
 - Upload log: `Documents\FootageVault\upload_log.csv` (changeable in Settings)
 - Google sign-in token: Windows Credential Manager (`FootageVault`)
 
-## Needs checking on a real PC
+## Testing status
 
-The automatic checks run on a cloud Windows machine without a YouTube account, so these can only be confirmed on
-your PC: signing in, a real upload to your channel, recording dates read from your cameras' files, drag-and-drop
-from File Explorer, and how Mica and your accent colour look.
+**Tested on a real PC (27 Oct 2026, version 1.0.11):** the app installs and runs, and nested folders work
+(sub-folders become `Story - Sub-folder` stories with the right titles).
+
+**Checked automatically on every build:** 46 core tests, plus a clean install on a Windows machine that opens every
+page with sample folders and checks for crashes, the Start menu entry and the Settings > Apps entry.
+
+**Not yet confirmed on a real PC:** recording dates read from the cameras' own files, drag-and-drop from File
+Explorer, renaming on disk with a real footage folder, a full day's volume against the daily limit.
